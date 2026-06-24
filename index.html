@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>用户行为弹窗 CMS 管理</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #232934;
+      background: #f3f3f5;
+    }
+    .loading {
+      padding: 20px 24px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 6px 32px rgba(0, 0, 0, .06);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading">正在加载用户行为弹窗 CMS 管理页面...</div>
+  <script type="module">
+    const parts = [
+      "chunks/part-aa",
+      "chunks/part-ab",
+      "chunks/part-ac",
+      "chunks/part-ad",
+      "chunks/part-ae",
+      "chunks/part-af"
+    ];
+
+    async function inflateBase64Gzip(base64) {
+      const binary = atob(base64.replace(/\s+/g, ""));
+      const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+      const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+      return await new Response(stream).text();
+    }
+
+    try {
+      const base64 = (await Promise.all(parts.map(path => fetch(path).then(res => {
+        if (!res.ok) throw new Error(`加载失败：${path}`);
+        return res.text();
+      })))).join("");
+      const html = await inflateBase64Gzip(base64);
+      document.open();
+      document.write(html);
+      document.close();
+    } catch (error) {
+      document.body.innerHTML = `<div class="loading">页面加载失败：${error.message}</div>`;
+      console.error(error);
+    }
+  </script>
+</body>
+</html>
